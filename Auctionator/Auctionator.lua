@@ -735,7 +735,7 @@ function Atr_REsearch_Toggle()
 	 end
 end 
 -----------------------------------------
-
+local renameSaved
 function Atr_GetSellItemInfo ()
 
 	local auctionItemName, auctionTexture, auctionCount = GetAuctionSellItemInfo();
@@ -764,37 +764,18 @@ function Atr_GetSellItemInfo ()
 			bloodforged = true;
 		end
 
-		if (Atr_RESearch == true)
-		then
-			for i=1,AtrScanningTooltip:NumLines()
-			do 
-				local text = getglobal("AtrScanningTooltipTextLeft" .. i)
-				text = text:GetText()
-				if (string.match(text, "Equip") == "Equip")
-				then
-					text = string.match(text, "(Equip: [^-]+)-")
-					if (text and text ~= "")
-					then 
-						-- RE: is used for checking bag count
-						text = text:gsub("Equip: ", "RE:")
-						-- trim
-						auctionItemName = text:gsub("^%s*(.-)%s*$", "%1")
-						exact = false
-					end
-				elseif (string.find(auctionItemName, "Mystic Scroll"))
-				then
-					text = string.sub(auctionItemName, 15)
-					if(text and text ~= "")
-					then 
-						-- RE: is used for checking bag count
-						text = text:gsub("Mystic Scroll: ", "RE:")
-						-- trim
-						auctionItemName = "RE:" .. text --text:gsub("^%s*(.-)%s*$", "%1")
-						exact = false
-					end
-				end
+			--Swap auction name to search for re on the item
+			if (Atr_RESearch == true) and ReName ~= nil then
+				auctionItemName = "RE:" .. MYSTIC_ENCHANTS[ReName].spellName;
+				exact = false;
+				renameSaved = ReName;
+				ReName = nil;
+				
+			elseif (Atr_RESearch == true) and ReName == nil then
+				auctionItemName = "RE:" .. MYSTIC_ENCHANTS[renameSaved].spellName;
+				exact = false;
+				ReName = nil;
 			end
-		end
 
 		if (auctionItemLink == nil) then
 			return "",0,nil;
@@ -1119,6 +1100,13 @@ local function Atr_LoadContainerItemToSellPane(slot)
 
 	if (IsControlKeyDown()) then
 		gAutoSingleton = time();
+	end
+
+	--Get MysticEnchant from alt left clicking item
+	if GetREInSlot(bagID, slotID) ~= nil then
+		ReName = GetREInSlot(bagID, slotID);
+	else
+		ReName = nil;
 	end
 
 	PickupContainerItem(bagID, slotID);
@@ -3747,6 +3735,15 @@ end
 
 function Atr_Duration_OnShow(self)
 	UIDropDownMenu_Initialize (self, Atr_Duration_Initialize);
+	--Hook Container ID to get MysticEnchant from item
+		hooksecurefunc("ContainerFrameItemButton_OnClick",function(self,button)
+			local bagID,slotID=self:GetParent():GetID(),self:GetID();
+			if GetREInSlot(bagID, slotID) ~= nil then
+				ReName = GetREInSlot(bagID, slotID);
+			else
+				ReName = nil;
+			end
+		end);
 end
 
 -----------------------------------------

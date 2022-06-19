@@ -735,7 +735,7 @@ function Atr_REsearch_Toggle()
 	 end
 end 
 -----------------------------------------
-local renameSaved
+local renameSaved = "";
 function Atr_GetSellItemInfo ()
 
 	local auctionItemName, auctionTexture, auctionCount = GetAuctionSellItemInfo();
@@ -770,11 +770,17 @@ function Atr_GetSellItemInfo ()
 				exact = false;
 				renameSaved = ReName;
 				ReName = nil;
-				
-			elseif (Atr_RESearch == true) and ReName == nil then
+			elseif (Atr_RESearch == true) and renameSaved ~= "" then
 				auctionItemName = "RE:" .. MYSTIC_ENCHANTS[renameSaved].spellName;
 				exact = false;
 				ReName = nil;
+			elseif (string.find(auctionItemName, "Mystic Scroll")) then
+				local text = string.sub(auctionItemName, 15)
+				if (text and text ~= "") then 
+					-- RE: is used for checking bag count
+					auctionItemName = "RE:" .. text --text:gsub("^%s*(.-)%s*$", "%1")
+					exact = false
+				end	
 			end
 
 		if (auctionItemLink == nil) then
@@ -1104,8 +1110,10 @@ local function Atr_LoadContainerItemToSellPane(slot)
 
 	--Get MysticEnchant from alt left clicking item
 	if GetREInSlot(bagID, slotID) ~= nil then
+		renameSaved = "";
 		ReName = GetREInSlot(bagID, slotID);
 	else
+		renameSaved = "";
 		ReName = nil;
 	end
 
@@ -3739,8 +3747,10 @@ function Atr_Duration_OnShow(self)
 		hooksecurefunc("ContainerFrameItemButton_OnClick",function(self,button)
 			local bagID,slotID=self:GetParent():GetID(),self:GetID();
 			if GetREInSlot(bagID, slotID) ~= nil then
+				renameSaved = "";
 				ReName = GetREInSlot(bagID, slotID);
 			else
+				renameSaved = "";
 				ReName = nil;
 			end
 		end);

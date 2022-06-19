@@ -729,10 +729,14 @@ local renameSaved = "";
 -----------------------------------------
 function Atr_REsearch_Toggle()
 	if Atr_RESearch:GetChecked() then	 
-			 renameSaved = "";
+		renameSaved = "";
 	 end
 end 
 -----------------------------------------
+
+function Atr_SetreName(name)
+	ReName = name;
+end
 
 function Atr_GetSellItemInfo ()
 

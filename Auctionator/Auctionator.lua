@@ -728,7 +728,7 @@ end
 
 -----------------------------------------
 function Atr_REsearch_Toggle()
-	if (Atr_RESearch) then
+	if (Atr_RESearch or Atr_RESearch == nil) then
 			 Atr_RESearch = false;
 	 else
 			 Atr_RESearch = true;

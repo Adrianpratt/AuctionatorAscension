@@ -549,7 +549,7 @@
 						<Size><AbsDimension x="30" y="30"/>	</Size>
 						<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="185" y="30"/></Offset></Anchor></Anchors>
 						<Scripts>
-						<OnLoad>Atr_REsearch_Toggle()</OnLoad>
+						<OnLoad>Atr_RESearch=false</OnLoad>
 						<OnClick>Atr_REsearch_Toggle()</OnClick>
 						</Scripts>
 					</CheckButton>

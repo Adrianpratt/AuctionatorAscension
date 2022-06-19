@@ -725,17 +725,18 @@ function Atr_ShowHide_StartingPrice()
 	end
 end
 
-
+local renameSaved = "";
 -----------------------------------------
 function Atr_REsearch_Toggle()
 	if (Atr_RESearch) then
 			 Atr_RESearch = false;
+			 renameSaved = "";
 	 else
 			 Atr_RESearch = true;
 	 end
 end 
 -----------------------------------------
-local renameSaved = "";
+
 function Atr_GetSellItemInfo ()
 
 	local auctionItemName, auctionTexture, auctionCount = GetAuctionSellItemInfo();
@@ -780,6 +781,7 @@ function Atr_GetSellItemInfo ()
 					-- RE: is used for checking bag count
 					auctionItemName = "RE:" .. text --text:gsub("^%s*(.-)%s*$", "%1")
 					exact = false
+					renameSaved = "";
 				end	
 			end
 

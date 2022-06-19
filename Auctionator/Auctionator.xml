@@ -545,7 +545,7 @@
 				</Layers>
 				
 				<Frames>
-					<CheckButton name="Atr_RESearch" inherits="UICheckButtonTemplate" enableMouse="true">
+					<CheckButton name="Atr_RE_Search" inherits="UICheckButtonTemplate" enableMouse="true">
 						<Size><AbsDimension x="30" y="30"/>	</Size>
 						<Anchors><Anchor point="TOPLEFT"><Offset><AbsDimension x="185" y="30"/></Offset></Anchor></Anchors>
 						<Scripts>

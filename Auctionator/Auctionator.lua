@@ -728,11 +728,8 @@ end
 local renameSaved = "";
 -----------------------------------------
 function Atr_REsearch_Toggle()
-	if (Atr_RESearch) then
-			 Atr_RESearch = false;
+	if Atr_RESearch:GetChecked() then	 
 			 renameSaved = "";
-	 else
-			 Atr_RESearch = true;
 	 end
 end 
 -----------------------------------------
@@ -766,12 +763,12 @@ function Atr_GetSellItemInfo ()
 		end
 
 			--Swap auction name to search for re on the item
-			if (Atr_RESearch == true) and ReName ~= nil then
+			if Atr_RESearch:GetChecked() and ReName ~= nil then
 				auctionItemName = "RE:" .. MYSTIC_ENCHANTS[ReName].spellName;
 				exact = false;
 				renameSaved = ReName;
 				ReName = nil;
-			elseif (Atr_RESearch == true) and renameSaved ~= "" then
+			elseif Atr_RESearch:GetChecked() and renameSaved ~= "" then
 				auctionItemName = "RE:" .. MYSTIC_ENCHANTS[renameSaved].spellName;
 				exact = false;
 				ReName = nil;

@@ -718,12 +718,12 @@ function Atr_GetSellItemInfo ()
 
 			--Swap auction name to search for re on the item
 			if Atr_RESearch:GetChecked() and ReName ~= nil then
-				auctionItemName = "RE:" .. MYSTIC_ENCHANTS[ReName].spellName;
+				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[ReName].spellID);
 				exact = false;
 				renameSaved = ReName;
 				ReName = nil;
 			elseif Atr_RESearch:GetChecked() and renameSaved ~= "" then
-				auctionItemName = "RE:" .. MYSTIC_ENCHANTS[renameSaved].spellName;
+				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[renameSaved].spellID);
 				exact = false;
 				ReName = nil;
 			elseif (string.find(auctionItemName, "Mystic Scroll")) then

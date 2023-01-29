@@ -708,14 +708,31 @@ function Atr_GetSellItemInfo ()
 		AtrScanningTooltip:SetAuctionSellItem();
 		local name;
 		name, auctionItemLink = AtrScanningTooltip:GetItem();
-		if (string.find(auctionItemName, "Bloodforged"))
-		then
-			auctionItemName = auctionItemName:gsub("Bloodforged ", "")
-			auctionItemName = auctionItemName:gsub(" of %a+$", "")
-			exact = false
-			bloodforged = true;
-		end
 
+		if AuctionatorOption_Remove_Bloodforge_CB:GetChecked() then
+			if (string.find(auctionItemName, "Bloodforged")) == 1 then
+				auctionItemName = auctionItemName:gsub("Bloodforged ", "")
+				exact = false
+				bloodforged = true;
+			end
+		end
+		if AuctionatorOption_Remove_Suffix_CB:GetChecked() then
+			local itemSuffixs = {
+				"of the Tiger",
+				"of the Bear",
+				"of the Gorilla",
+				"of the Boar",
+				"of the Monkey",
+				"of the Falcon",
+				"of the Wolf",
+				"of the Eagle",
+				"of the Whale",
+				"of the Owl",
+			}
+			for _, suffix in ipairs(itemSuffixs) do
+				auctionItemName = auctionItemName:gsub(" "..suffix, "")
+			end
+		end
 			--Swap auction name to search for re on the item
 			if Atr_RESearch:GetChecked() and ReName ~= nil then
 				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[ReName].spellID);
@@ -1041,13 +1058,17 @@ function Atr_SellItemButton_OnEvent (self, event, ...)
 	end
 	
 end
-
+local gPrevSellItemLink;
 -----------------------------------------
 
 local function Atr_LoadContainerItemToSellPane()
-
+	
 	local bagID  = this:GetParent():GetID();
 	local slotID = this:GetID();
+
+	if Atr_RESearch:GetChecked() then
+		gPrevSellItemLink = nil
+	end
 
 	if (not Atr_IsTabSelected(SELL_TAB)) then
 		Atr_SelectPane (SELL_TAB);
@@ -1060,12 +1081,13 @@ local function Atr_LoadContainerItemToSellPane()
 	PickupContainerItem(bagID, slotID);
 	--Get MysticEnchant from alt left clicking item
 	if GetREInSlot(bagID, slotID) ~= nil then
-		renameSaved = "";
 		ReName = GetREInSlot(bagID, slotID);
+		renameSaved = "";
 	else
 		renameSaved = "";
 		ReName = nil;
 	end
+	
 	local infoType = GetCursorInfo()
 
 	if (infoType == "item") then
@@ -1073,6 +1095,7 @@ local function Atr_LoadContainerItemToSellPane()
 		Atr_ClickAuctionSellItemButton ();
 		ClearCursor();
 	end
+		
 
 end
 
@@ -1200,9 +1223,8 @@ end
 -----------------------------------------
 
 function Atr_LogMsg (itemlink, itemcount, price, numstacks)
-
 	local logmsg = string.format (ZT("Auction created for %s"), itemlink);
-	
+
 	if (numstacks > 1) then
 		logmsg = string.format (ZT("%d auctions created for %s"), numstacks, itemlink);
 	end
@@ -2294,7 +2316,7 @@ end
 
 -----------------------------------------
 
-local gPrevSellItemLink;
+
 
 -----------------------------------------
 
@@ -2304,7 +2326,6 @@ function Atr_OnNewAuctionUpdate()
 		gPrevSellItemLink = nil;
 		return;
 	end
-	
 --	zc.md ("gAtr_ClickAuctionSell:", gAtr_ClickAuctionSell);
 	
 	gAtr_ClickAuctionSell = false;

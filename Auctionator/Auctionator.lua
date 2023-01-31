@@ -18,6 +18,8 @@ local recommendElements			= {};
 AUCTIONATOR_ENABLE_ALT		= 1;
 AUCTIONATOR_OPEN_ALL_BAGS	= 1;
 AUCTIONATOR_SHOW_ST_PRICE	= 0;
+AUCTIONATOR_ROMOVE_BLOOFORGED = 1;
+AUCTIONATOR_ROMOVE_SUFFIX = 1;
 AUCTIONATOR_SHOW_TIPS		= 1;
 AUCTIONATOR_DEF_DURATION	= "N";		-- none
 AUCTIONATOR_V_TIPS			= 1;
@@ -681,16 +683,18 @@ function Atr_ShowHide_StartingPrice()
 	end
 end
 
-local renameSaved = "";
+Atr_ReNameSaved = "";
 -----------------------------------------
 function Atr_REsearch_Toggle()
 	if Atr_RESearch:GetChecked() then
-		renameSaved = "";
+		Atr_ReNameSaved = ""
 	 end
 end 
+
 function Atr_SetreName(name)
-	ReName = name;
+	Atr_ReName = name;
 end
+
 function Atr_GetSellItemInfo ()
 
 	local auctionItemName, auctionTexture, auctionCount = GetAuctionSellItemInfo();
@@ -734,22 +738,22 @@ function Atr_GetSellItemInfo ()
 			end
 		end
 			--Swap auction name to search for re on the item
-			if Atr_RESearch:GetChecked() and ReName ~= nil then
-				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[ReName].spellID);
+			if Atr_RESearch:GetChecked() and Atr_ReName ~= nil then
+				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[Atr_ReName].spellID);
 				exact = false;
-				renameSaved = ReName;
-				ReName = nil;
-			elseif Atr_RESearch:GetChecked() and renameSaved ~= "" then
-				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[renameSaved].spellID);
+				Atr_ReNameSaved = Atr_ReName;
+				Atr_ReName = nil;
+			elseif Atr_RESearch:GetChecked() and Atr_ReNameSaved ~= "" then
+				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[Atr_ReNameSaved].spellID);
 				exact = false;
-				ReName = nil;
-			elseif (string.find(auctionItemName, "Mystic Scroll")) then
+				Atr_ReName = nil;
+			elseif (string.find(auctionItemName, "Mystic Scroll")) == 1 then
 				local text = string.sub(auctionItemName, 15)
 				if (text and text ~= "") then 
 					-- RE: is used for checking bag count
 					auctionItemName = "RE:" .. text --text:gsub("^%s*(.-)%s*$", "%1")
 					exact = false
-					renameSaved = "";
+					Atr_ReNameSaved = ""
 				end	
 			end
 
@@ -1081,11 +1085,11 @@ local function Atr_LoadContainerItemToSellPane()
 	PickupContainerItem(bagID, slotID);
 	--Get MysticEnchant from alt left clicking item
 	if GetREInSlot(bagID, slotID) ~= nil then
-		ReName = GetREInSlot(bagID, slotID);
-		renameSaved = "";
+		Atr_ReName = GetREInSlot(bagID, slotID);
+		Atr_ReNameSaved = ""
 	else
-		renameSaved = "";
-		ReName = nil;
+		Atr_ReNameSaved = ""
+		Atr_ReName = nil;
 	end
 	
 	local infoType = GetCursorInfo()
@@ -1223,26 +1227,25 @@ end
 -----------------------------------------
 
 function Atr_LogMsg (itemlink, itemcount, price, numstacks)
-	local logmsg = string.format (ZT("Auction created for %s"), itemlink);
+	if itemlink then
+		local logmsg = string.format (ZT("Auction created for %s"), itemlink);
 
-	if (numstacks > 1) then
-		logmsg = string.format (ZT("%d auctions created for %s"), numstacks, itemlink);
+		if (numstacks > 1) then
+			logmsg = string.format (ZT("%d auctions created for %s"), numstacks, itemlink);
+		end
+		
+		if (itemcount > 1) then
+			logmsg = logmsg.."|cff00ddddx"..itemcount.."|r";
+		end
+
+		logmsg = logmsg.."   "..zc.priceToString(price);
+
+		if (numstacks > 1 and itemcount > 1) then
+			logmsg = logmsg.."  per stack";
+		end
+		
+		zc.msg_yellow (logmsg);
 	end
-	
-	
-	if (itemcount > 1) then
-		logmsg = logmsg.."|cff00ddddx"..itemcount.."|r";
-	end
-
-	logmsg = logmsg.."   "..zc.priceToString(price);
-
-	if (numstacks > 1 and itemcount > 1) then
-		logmsg = logmsg.."  per stack";
-	end
-	
-
-	zc.msg_yellow (logmsg);
-
 end
 
 -----------------------------------------
@@ -2359,7 +2362,7 @@ function Atr_OnNewAuctionUpdate()
 			gSellPane.fullStackSize = auctionLink and (select (8, GetItemInfo (auctionLink))) or 0;
 
 			local prefNumStacks, prefStackSize = Atr_GetSellStacking (auctionLink, auctionCount, gSellPane.totalItems);
-			
+
 			if (time() - gAutoSingleton < 5) then
 				Atr_SetInitialStacking (1, 1);
 			else
@@ -2608,7 +2611,7 @@ end
 
 function Atr_GetUCIcon (itemName)
 
-	local icon = "|TInterface\\BUTTONS\\\UI-PassiveHighlight:18:18:0:0|t "
+	local icon = "|TInterface\\BUTTONS\\UI-PassiveHighlight:18:18:0:0|t "
 
 	local undercutFound = false;
 	
@@ -2621,9 +2624,9 @@ function Atr_GetUCIcon (itemName)
 			icon = "|TInterface\\AddOns\\Auctionator\\Images\\CrossAndCheck:18:18:0:0|t "
 			undercutFound = true;
 		elseif (scan.yourBestPrice <= absBestPrice) then
-			icon = "|TInterface\\RAIDFRAME\\\ReadyCheck-Ready:18:18:0:0|t "
+			icon = "|TInterface\\RAIDFRAME\\ReadyCheck-Ready:18:18:0:0|t "
 		else
-			icon = "|TInterface\\RAIDFRAME\\\ReadyCheck-NotReady:18:18:0:0|t "
+			icon = "|TInterface\\RAIDFRAME\\ReadyCheck-NotReady:18:18:0:0|t "
 			undercutFound = true;
 		end
 	end
@@ -3650,11 +3653,11 @@ function Atr_Duration_OnShow(self)
 		hooksecurefunc("ContainerFrameItemButton_OnClick",function(self,button)
 			local bagID,slotID=self:GetParent():GetID(),self:GetID();
 			if GetREInSlot(bagID, slotID) ~= nil then
-				renameSaved = "";
-				ReName = GetREInSlot(bagID, slotID);
+				Atr_ReNameSaved = ""
+				Atr_ReName = GetREInSlot(bagID, slotID);
 			else
-				renameSaved = "";
-				ReName = nil;
+				Atr_ReNameSaved = ""
+				Atr_ReName = nil;
 			end
 		end);
 end

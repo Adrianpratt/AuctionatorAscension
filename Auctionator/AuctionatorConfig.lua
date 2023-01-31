@@ -89,11 +89,13 @@ end
 
 function Atr_BasicOptionsFrame_Save()
 
-	local origValues = zc.msg_str (AUCTIONATOR_ENABLE_ALT, AUCTIONATOR_OPEN_ALL_BAGS, AUCTIONATOR_SHOW_ST_PRICE, AUCTIONATOR_DEFTAB, AUCTIONATOR_DEF_DURATION);
+	local origValues = zc.msg_str (AUCTIONATOR_ENABLE_ALT, AUCTIONATOR_OPEN_ALL_BAGS, AUCTIONATOR_SHOW_ST_PRICE, AUCTIONATOR_DEFTAB, AUCTIONATOR_DEF_DURATION, AUCTIONATOR_ROMOVE_BLOOFORGED, AUCTIONATOR_ROMOVE_SUFFIX);
 
 	AUCTIONATOR_ENABLE_ALT		= zc.BoolToNum(AuctionatorOption_Enable_Alt_CB:GetChecked ());
 	AUCTIONATOR_OPEN_ALL_BAGS	= zc.BoolToNum(AuctionatorOption_Open_All_Bags_CB:GetChecked ());
 	AUCTIONATOR_SHOW_ST_PRICE	= zc.BoolToNum(AuctionatorOption_Show_StartingPrice_CB:GetChecked ());
+	AUCTIONATOR_ROMOVE_BLOOFORGED = zc.BoolToNum(AuctionatorOption_Remove_Bloodforge_CB:GetChecked ());
+	AUCTIONATOR_ROMOVE_SUFFIX = zc.BoolToNum(AuctionatorOption_Remove_Suffix_CB:GetChecked ());
 
 	AUCTIONATOR_DEFTAB			= UIDropDownMenu_GetSelectedValue(AuctionatorOption_Deftab);
 
@@ -105,7 +107,7 @@ function Atr_BasicOptionsFrame_Save()
 		if (Atr_RB_L:GetChecked())	then	AUCTIONATOR_DEF_DURATION = "L"; end;
 	end
 
-	local newValues = zc.msg_str (AUCTIONATOR_ENABLE_ALT, AUCTIONATOR_OPEN_ALL_BAGS, AUCTIONATOR_SHOW_ST_PRICE, AUCTIONATOR_DEFTAB, AUCTIONATOR_DEF_DURATION);
+	local newValues = zc.msg_str (AUCTIONATOR_ENABLE_ALT, AUCTIONATOR_OPEN_ALL_BAGS, AUCTIONATOR_SHOW_ST_PRICE, AUCTIONATOR_DEFTAB, AUCTIONATOR_DEF_DURATION, AUCTIONATOR_ROMOVE_BLOOFORGED, AUCTIONATOR_ROMOVE_SUFFIX);
 
 	if (origValues ~= newValues) then
 		zc.msg_atr (ZT ("basic options saved"));
@@ -124,6 +126,8 @@ function Atr_SetupBasicOptionsFrame()
 	AuctionatorOption_Enable_Alt_CB:SetChecked			(zc.NumToBool(AUCTIONATOR_ENABLE_ALT));
 	AuctionatorOption_Open_All_Bags_CB:SetChecked		(zc.NumToBool(AUCTIONATOR_OPEN_ALL_BAGS));
 	AuctionatorOption_Show_StartingPrice_CB:SetChecked	(zc.NumToBool(AUCTIONATOR_SHOW_ST_PRICE));
+	AuctionatorOption_Remove_Bloodforge_CB:SetChecked	(zc.NumToBool(AUCTIONATOR_ROMOVE_BLOOFORGED));
+	AuctionatorOption_Remove_Suffix_CB:SetChecked		(zc.NumToBool(AUCTIONATOR_ROMOVE_SUFFIX));
 
 	UIDropDownMenu_Initialize		(AuctionatorOption_Deftab, AuctionatorOption_Deftab_Initialize);
 	UIDropDownMenu_SetSelectedValue	(AuctionatorOption_Deftab, AUCTIONATOR_DEFTAB);

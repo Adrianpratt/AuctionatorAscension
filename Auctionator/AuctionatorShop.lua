@@ -129,8 +129,6 @@ function Atr_SList:DisplayX ()
 
 
 	local numrows = #self.items;
-
-	local line;							-- 1 through NN of our window to scroll
 	local dataOffset;					-- an index into our data calculated from the scroll offset
 
 	FauxScrollFrame_Update (Atr_Hlist_ScrollFrame, numrows, SLITEMS_NUM_LINES, 16);

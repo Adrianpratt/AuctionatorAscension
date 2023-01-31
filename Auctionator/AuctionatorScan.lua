@@ -630,14 +630,13 @@ function AtrSearch:Finish()
 	self.sortedScans = {};
 	
 	for name,scn in pairs (self.items) do
-	
 		self.sortedScans[x] = scn;
 		x = x + 1;
 		
 		scn.whenScanned		= finishTime;
 		scn.searchWasExact	= wasExactSearch;
 
-		scn:CondenseAndSort ();
+		scn:CondenseAndSort();
 
 		-- update the fullscan DB
 		
@@ -649,7 +648,7 @@ function AtrSearch:Finish()
 			end
 		end
 	end
-	
+
 	Atr_ClearBrowseListings();
 	
 	gSortScansBy = self.sortHow;
@@ -740,7 +739,6 @@ function AtrScan:CondenseAndSort ()
 
 	self.sortedData	= {};
 
-	local i,sd;
 	local conddata = {};
 
 	for i,sd in ipairs (self.scanData) do
@@ -799,9 +797,7 @@ function AtrScan:CondenseAndSort ()
 
 	local n = 1;
 
-	local i, v;
-
-	for i,v in pairs (conddata) do
+	for _,v in pairs (conddata) do
 		self.sortedData[n] = v;
 		n = n + 1;
 	end

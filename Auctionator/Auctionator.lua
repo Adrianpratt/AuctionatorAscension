@@ -2666,7 +2666,7 @@ end
 
 function Atr_GetUCIcon (itemName)
 
-	local icon = "|TInterface\\BUTTONS\\\UI-PassiveHighlight:18:18:0:0|t "
+	local icon = "|TInterface\\BUTTONS\\UI-PassiveHighlight:18:18:0:0|t "
 
 	local undercutFound = false;
 	
@@ -2679,9 +2679,9 @@ function Atr_GetUCIcon (itemName)
 			icon = "|TInterface\\AddOns\\Auctionator\\Images\\CrossAndCheck:18:18:0:0|t "
 			undercutFound = true;
 		elseif (scan.yourBestPrice <= absBestPrice) then
-			icon = "|TInterface\\RAIDFRAME\\\ReadyCheck-Ready:18:18:0:0|t "
+			icon = "|TInterface\\RAIDFRAME\\ReadyCheck-Ready:18:18:0:0|t "
 		else
-			icon = "|TInterface\\RAIDFRAME\\\ReadyCheck-NotReady:18:18:0:0|t "
+			icon = "|TInterface\\RAIDFRAME\\ReadyCheck-NotReady:18:18:0:0|t "
 			undercutFound = true;
 		end
 	end

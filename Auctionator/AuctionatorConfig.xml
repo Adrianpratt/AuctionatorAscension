@@ -155,7 +155,7 @@
 			<Frame name="AuctionatorOption_Remove_Suffix" inherits="Atr_SingleOptionTemplate">
 				<Anchors><Anchor point="TOP"><Offset><AbsDimension y="-255"/></Offset></Anchor></Anchors>
 				<Scripts>
-					<OnLoad>	AuctionatorOption_Remove_Suffix_CB_Text:SetText (ZT("Remove of the suffixs eg: of the Bear"));	</OnLoad>
+					<OnLoad>	AuctionatorOption_Remove_Suffix_CB_Text:SetText (ZT("Remove item suffixs (eg:of the Bear)"));	</OnLoad>
 				</Scripts>
 			</Frame>
 

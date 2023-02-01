@@ -139,7 +139,7 @@ function Atr_SList:DisplayX ()
 		
 		dataOffset = line + currentPane.hlistScrollOffset;
 
-		local lineEntry = getglobal ("AuctionatorHEntry"..line);
+		local lineEntry = _G["AuctionatorHEntry"..line];
 
 		lineEntry:SetID(dataOffset);
 
@@ -147,7 +147,7 @@ function Atr_SList:DisplayX ()
 		
 		if (dataOffset <= numrows and slItem) then
 
-			local lineEntry_text = getglobal("AuctionatorHEntry"..line.."_EntryText");
+			local lineEntry_text = _G["AuctionatorHEntry"..line.."_EntryText"];
 
 			lineEntry_text:SetText		(Atr_AbbrevItemName (slItem));
 			lineEntry_text:SetTextColor	(.6,.6,.6);

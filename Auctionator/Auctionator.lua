@@ -642,13 +642,13 @@ function Atr_Init()
 
 	Atr_SetupHookFunctions ();
 
-	recommendElements[1] = getglobal ("Atr_Recommend_Text");
-	recommendElements[2] = getglobal ("Atr_RecommendPerItem_Text");
-	recommendElements[3] = getglobal ("Atr_RecommendPerItem_Price");
-	recommendElements[4] = getglobal ("Atr_RecommendPerStack_Text");
-	recommendElements[5] = getglobal ("Atr_RecommendPerStack_Price");
-	recommendElements[6] = getglobal ("Atr_Recommend_Basis_Text");
-	recommendElements[7] = getglobal ("Atr_RecommendItem_Tex");
+	recommendElements[1] = _G["Atr_Recommend_Text"];
+	recommendElements[2] = _G["Atr_RecommendPerItem_Text"];
+	recommendElements[3] = _G["Atr_RecommendPerItem_Price"];
+	recommendElements[4] = _G["Atr_RecommendPerStack_Text"];
+	recommendElements[5] = _G["Atr_RecommendPerStack_Price"];
+	recommendElements[6] = _G["Atr_Recommend_Basis_Text"];
+	recommendElements[7] = _G["Atr_RecommendItem_Tex"];
 
 	-- create the lines that appear in the item history scroll pane
 
@@ -792,7 +792,7 @@ function Atr_FindTabIndex (whichTab)
 
 		local i = 4;
 		while (true)  do
-			local tab = getglobal('AuctionFrameTab'..i);
+			local tab = _G['AuctionFrameTab'..i];
 			if (tab == nil) then
 				break;
 			end
@@ -850,7 +850,7 @@ function Atr_AuctionFrameTab_OnClick (self, index, down)
 		index = self:GetID();
 	end
 
-	getglobal("Atr_Main_Panel"):Hide();
+	_G["Atr_Main_Panel"]:Hide();
 
 	gBuyState = ATR_BUY_NULL;			-- just in case
 	gItemPostingInProgress = false;		-- just in case
@@ -965,7 +965,7 @@ function Atr_AuctionFrameTab_OnClick (self, index, down)
 
 		Atr_HideElems (recommendElements);
 
-		getglobal("Atr_Main_Panel"):Show();
+		_G["Atr_Main_Panel"]:Show();
 
 		gCurrentPane.UINeedsUpdate = true;
 
@@ -995,7 +995,7 @@ end
 function Atr_SelectPane (whichTab)
 
 	local index = Atr_FindTabIndex(whichTab);
-	local tab   = getglobal('AuctionFrameTab'..index);
+	local tab   = _G['AuctionFrameTab'..index];
 	
 	Atr_AuctionFrameTab_OnClick (tab, index);
 
@@ -1400,11 +1400,11 @@ function Atr_AddSellTab (tabtext, whichTab)
 	frame:SetID(n);
 	frame:SetText(tabtext);
 
-	frame:SetNormalFontObject(getglobal("AtrFontOrange"));
+	frame:SetNormalFontObject(_G["AtrFontOrange"]);
 
 	frame.auctionatorTab = whichTab;
 
-	frame:SetPoint("LEFT", getglobal("AuctionFrameTab"..n-1), "RIGHT", -8, 0);
+	frame:SetPoint("LEFT", _G["AuctionFrameTab"..n-1], "RIGHT", -8, 0);
 
 	PanelTemplates_SetNumTabs (AuctionFrame, n);
 	PanelTemplates_EnableTab  (AuctionFrame, n);
@@ -1546,7 +1546,7 @@ function Atr_ClearList ()
 	FauxScrollFrame_Update (AuctionatorScrollFrame, 0, 12, 16);
 
 	for line = 1,12 do
-		local lineEntry = getglobal ("AuctionatorEntry"..line);
+		local lineEntry = _G["AuctionatorEntry"..line];
 		lineEntry:Hide();
 	end
 
@@ -2074,7 +2074,7 @@ function Atr_SetTextureButton (elementName, count, itemlink)
 
 	local texture = GetItemIcon (itemlink);
 
-	local textureElement = getglobal (elementName);
+	local textureElement = _G[elementName];
 
 	if (texture) then
 		textureElement:Show();
@@ -2090,7 +2090,7 @@ end
 
 function Atr_SetTextureButtonCount (elementName, count)
 
-	local countElement   = getglobal (elementName.."Count");
+	local countElement   = _G[elementName.."Count"];
 
 	if (count > 1) then
 		countElement:SetText (count);
@@ -2665,13 +2665,13 @@ function Atr_DisplayHlist ()
 		
 		dataOffset = line + gCurrentPane.hlistScrollOffset;
 
-		local lineEntry = getglobal ("AuctionatorHEntry"..line);
+		local lineEntry = _G["AuctionatorHEntry"..line];
 
 		lineEntry:SetID(dataOffset);
 
 		if (dataOffset <= numrows and gHistoryItemList[dataOffset]) then
 
-			local lineEntry_text = getglobal("AuctionatorHEntry"..line.."_EntryText");
+			local lineEntry_text = _G["AuctionatorHEntry"..line.."_EntryText"];
 
 			local iName = gHistoryItemList[dataOffset];
 
@@ -2704,10 +2704,10 @@ end
 function Atr_ClearHlist ()
 	local line;
 	for line = 1,ITEM_HIST_NUM_LINES do
-		local lineEntry = getglobal ("AuctionatorHEntry"..line);
+		local lineEntry = _G["AuctionatorHEntry"..line];
 		lineEntry:Hide();
 		
-		local lineEntry_text = getglobal("AuctionatorHEntry"..line.."_EntryText");
+		local lineEntry_text = _G["AuctionatorHEntry"..line.."_EntryText"];
 		lineEntry_text:SetText		("");
 		lineEntry_text:SetTextColor	(.7,.7,.7);
 	end
@@ -2950,7 +2950,7 @@ function Atr_ShowSearchSummary()
 		dataOffset	= dataOffset + 1;
 		line		= line + 1;
 
-		local lineEntry = getglobal ("AuctionatorEntry"..line);
+		local lineEntry = _G["AuctionatorEntry"..line];
 
 		lineEntry:SetID(dataOffset);
 
@@ -2969,10 +2969,10 @@ function Atr_ShowSearchSummary()
 
 			local lineEntry_item_tag = "AuctionatorEntry"..line.."_PerItem_Price";
 
-			local lineEntry_item		= getglobal(lineEntry_item_tag);
-			local lineEntry_itemtext	= getglobal("AuctionatorEntry"..line.."_PerItem_Text");
-			local lineEntry_text		= getglobal("AuctionatorEntry"..line.."_EntryText");
-			local lineEntry_stack		= getglobal("AuctionatorEntry"..line.."_StackPrice");
+			local lineEntry_item		= _G[lineEntry_item_tag];
+			local lineEntry_itemtext	= _G["AuctionatorEntry"..line.."_PerItem_Text"];
+			local lineEntry_text		= _G["AuctionatorEntry"..line.."_EntryText"];
+			local lineEntry_stack		= _G["AuctionatorEntry"..line.."_StackPrice"];
 
 			lineEntry_itemtext:SetText	("");
 			lineEntry_text:SetText	("");
@@ -3058,7 +3058,7 @@ function Atr_ShowCurrentAuctions()
 		dataOffset	= dataOffset + 1;
 		line		= line + 1;
 
-		local lineEntry = getglobal ("AuctionatorEntry"..line);
+		local lineEntry = _G["AuctionatorEntry"..line];
 
 		lineEntry:SetID(dataOffset);
 
@@ -3073,10 +3073,10 @@ function Atr_ShowCurrentAuctions()
 
 			local lineEntry_item_tag = "AuctionatorEntry"..line.."_PerItem_Price";
 
-			local lineEntry_item		= getglobal(lineEntry_item_tag);
-			local lineEntry_itemtext	= getglobal("AuctionatorEntry"..line.."_PerItem_Text");
-			local lineEntry_text		= getglobal("AuctionatorEntry"..line.."_EntryText");
-			local lineEntry_stack		= getglobal("AuctionatorEntry"..line.."_StackPrice");
+			local lineEntry_item		= _G[lineEntry_item_tag];
+			local lineEntry_itemtext	= _G["AuctionatorEntry"..line.."_PerItem_Text"];
+			local lineEntry_text		= _G["AuctionatorEntry"..line.."_EntryText"];
+			local lineEntry_stack		= _G["AuctionatorEntry"..line.."_StackPrice"];
 
 			lineEntry_itemtext:SetText	("");
 			lineEntry_text:SetText	("");
@@ -3173,7 +3173,7 @@ function Atr_ShowHistory ()
 
 		dataOffset = line + FauxScrollFrame_GetOffset (AuctionatorScrollFrame);
 
-		local lineEntry = getglobal ("AuctionatorEntry"..line);
+		local lineEntry = _G["AuctionatorEntry"..line];
 
 		lineEntry:SetID(dataOffset);
 
@@ -3183,10 +3183,10 @@ function Atr_ShowHistory ()
 
 			local lineEntry_item_tag = "AuctionatorEntry"..line.."_PerItem_Price";
 
-			local lineEntry_item		= getglobal(lineEntry_item_tag);
-			local lineEntry_itemtext	= getglobal("AuctionatorEntry"..line.."_PerItem_Text");
-			local lineEntry_text		= getglobal("AuctionatorEntry"..line.."_EntryText");
-			local lineEntry_stack		= getglobal("AuctionatorEntry"..line.."_StackPrice");
+			local lineEntry_item		= _G[lineEntry_item_tag];
+			local lineEntry_itemtext	= _G["AuctionatorEntry"..line.."_PerItem_Text"];
+			local lineEntry_text		= _G["AuctionatorEntry"..line.."_EntryText"];
+			local lineEntry_stack		= _G["AuctionatorEntry"..line.."_StackPrice"];
 
 			lineEntry_item:Show();
 			lineEntry_itemtext:Hide();
@@ -3245,7 +3245,7 @@ function Atr_HighlightEntry(entryIndex)
 
 	for line = 1,12 do
 
-		local lineEntry = getglobal ("AuctionatorEntry"..line);
+		local lineEntry = _G["AuctionatorEntry"..line];
 
 		if (lineEntry:GetID() == entryIndex) then
 			lineEntry:SetButtonState ("PUSHED", true);
@@ -4183,7 +4183,7 @@ function Atr_Hilight_Hentry(itemName)
 
 		dataOffset = line + FauxScrollFrame_GetOffset (Atr_Hlist_ScrollFrame);
 
-		local lineEntry = getglobal ("AuctionatorHEntry"..line);
+		local lineEntry = _G["AuctionatorHEntry"..line];
 
 		if (dataOffset <= #gHistoryItemList and gHistoryItemList[dataOffset]) then
 

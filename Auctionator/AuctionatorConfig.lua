@@ -12,13 +12,13 @@ function Atr_LoadOptionsSubPanel (f, name, title, subtitle)
 
 	local frameName = f:GetName();
 	
-	f.okay   = getglobal (frameName.."_Save")
+	f.okay   = _G[frameName.."_Save"]
 
 	if (title    == nil) then title = name; end
 	if (subtitle == nil) then subtitle = ""; end
 	
-	getglobal (frameName.."_ATitle"):SetText (title);
-	getglobal (frameName.."_BTitle"):SetText (subtitle);
+	_G[frameName.."_ATitle"]:SetText (title);
+	_G[frameName.."_BTitle"]:SetText (subtitle);
 	
 	InterfaceOptions_AddCategory (f);
 
@@ -269,9 +269,9 @@ function Atr_SetupUCConfigFrame()
 		local amt		= kThresh[i].amt;
 		local linetext	= string.format (kThresh[i].text, kThresh[i].v);
 
-		getglobal("UC_"..amt.."_RangeText"):SetText (linetext);
+		_G["UC_"..amt.."_RangeText"]:SetText (linetext);
 
-		MoneyInputFrame_SetCopper (getglobal("UC_"..amt.."_MoneyInput"), AUCTIONATOR_SAVEDVARS["_"..amt]);
+		MoneyInputFrame_SetCopper (_G["UC_"..amt.."_MoneyInput"], AUCTIONATOR_SAVEDVARS["_"..amt]);
 	end
 
 	Atr_Starting_Discount:SetText (AUCTIONATOR_SAVEDVARS.STARTING_DISCOUNT);
@@ -294,7 +294,7 @@ function Atr_UCConfigFrame_Save()
 	
 		origValues = origValues + AUCTIONATOR_SAVEDVARS["_"..amt];
 		
-		AUCTIONATOR_SAVEDVARS["_"..amt]	= MoneyInputFrame_GetCopper(getglobal("UC_"..amt.."_MoneyInput"));
+		AUCTIONATOR_SAVEDVARS["_"..amt]	= MoneyInputFrame_GetCopper(_G["UC_"..amt.."_MoneyInput"]);
 		
 		newValues = newValues + AUCTIONATOR_SAVEDVARS["_"..amt];
 	end
@@ -343,7 +343,7 @@ kStackList_categories[ATR_SK_HERBS]			= { txt=ZT("Herbs")	}
 
 function Atr_SetupStackingFrame ()
 
-	if (getglobal ("Atr_StackList1") == nil) then
+	if (_G["Atr_StackList1"] == nil) then
 		local line, n;
 
 		for n = 1, kStackList_LinesToDisplay do
@@ -410,14 +410,14 @@ function Atr_StackingList_Display()
 
 		dataOffset = line + FauxScrollFrame_GetOffset (Atr_Stacking_ScrollFrame);
 
-		local lineEntry = getglobal ("Atr_StackList"..line);
+		local lineEntry = _G["Atr_StackList"..line];
 
 		lineEntry:SetID (dataOffset);
 
 		if (dataOffset <= totalRows and plist[dataOffset]) then
 
-			local lineEntry_text = getglobal("Atr_StackList"..line.."_text");
-			local lineEntry_info = getglobal("Atr_StackList"..line.."_info");
+			local lineEntry_text = _G["Atr_StackList"..line.."_text"];
+			local lineEntry_info = _G["Atr_StackList"..line.."_info"];
 
 			local pdata = plist[dataOffset];
 			
@@ -642,7 +642,7 @@ function Atr_ShowOptionTooltip (elem)
 	end
 
 	if (text) then
-		local titleFrame = getglobal (name.."_CB_Text") or getglobal (name.."_Text");
+		local titleFrame = _G[name.."_CB_Text"] or _G[name.."_Text"];
 		
 		local titleText = titleFrame and titleFrame:GetText() or "???";
 		
@@ -740,12 +740,12 @@ local gInterfaceOptionsMask;
 function ShowInterfaceOptionsMask()
 
 	if (gInterfaceOptionsMask == nil) then
-		gInterfaceOptionsMask = CreateFrame ("Frame", "Atr_Mask_StdOptions", getglobal("InterfaceOptionsFrame"), "Atr_Mask_StdOptionsTempl");
+		gInterfaceOptionsMask = CreateFrame ("Frame", "Atr_Mask_StdOptions", _G["InterfaceOptionsFrame"], "Atr_Mask_StdOptionsTempl");
 		gInterfaceOptionsMask:SetFrameLevel (129);
 	end
-	
+
 	gInterfaceOptionsMask:Show();
-	
+
 end
 
 -----------------------------------------

@@ -149,7 +149,7 @@ function Atr_ShowHints ()
 
 		dataOffset = line + FauxScrollFrame_GetOffset (AuctionatorScrollFrame);
 
-		local lineEntry = getglobal ("AuctionatorEntry"..line);
+		local lineEntry = _G["AuctionatorEntry"..line];
 
 		lineEntry:SetID(dataOffset);
 
@@ -159,10 +159,10 @@ function Atr_ShowHints ()
 
 			local lineEntry_item_tag = "AuctionatorEntry"..line.."_PerItem_Price";
 
-			local lineEntry_item		= getglobal(lineEntry_item_tag);
-			local lineEntry_itemtext	= getglobal("AuctionatorEntry"..line.."_PerItem_Text");
-			local lineEntry_text		= getglobal("AuctionatorEntry"..line.."_EntryText");
-			local lineEntry_stack		= getglobal("AuctionatorEntry"..line.."_StackPrice");
+			local lineEntry_item		= _G[lineEntry_item_tag];
+			local lineEntry_itemtext	= _G["AuctionatorEntry"..line.."_PerItem_Text"];
+			local lineEntry_text		= _G["AuctionatorEntry"..line.."_EntryText"];
+			local lineEntry_stack		= _G["AuctionatorEntry"..line.."_StackPrice"];
 
 			lineEntry_item:Show();
 			lineEntry_itemtext:Hide();
@@ -194,9 +194,9 @@ end
 
 function Atr_SetMFcolor (frameName, blue)
 
-	local goldButton = getglobal(frameName.."GoldButton");
-	local silverButton = getglobal(frameName.."SilverButton");
-	local copperButton = getglobal(frameName.."CopperButton");
+	local goldButton = _G[frameName.."GoldButton"];
+	local silverButton = _G[frameName.."SilverButton"];
+	local copperButton = _G[frameName.."CopperButton"];
 
 	if (blue) then
 		goldButton:SetNormalFontObject(NumberFontNormalRightATRblue);

@@ -738,15 +738,15 @@ function Atr_GetSellItemInfo ()
 			end
 		end
 			--Swap auction name to search for re on the item
-			if Atr_RESearch:GetChecked() and Atr_ReName ~= nil then
+			if Atr_RESearch:GetChecked() and Atr_ReName ~= "" then
 				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[Atr_ReName].spellID);
 				exact = false;
 				Atr_ReNameSaved = Atr_ReName;
-				Atr_ReName = nil;
+				Atr_ReName = "";
 			elseif Atr_RESearch:GetChecked() and Atr_ReNameSaved ~= "" then
 				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[Atr_ReNameSaved].spellID);
 				exact = false;
-				Atr_ReName = nil;
+				Atr_ReName = "";
 			elseif (string.find(auctionItemName, "Mystic Scroll")) == 1 then
 				local text = string.sub(auctionItemName, 15)
 				if (text and text ~= "") then 
@@ -1089,7 +1089,7 @@ local function Atr_LoadContainerItemToSellPane()
 		Atr_ReNameSaved = ""
 	else
 		Atr_ReNameSaved = ""
-		Atr_ReName = nil;
+		Atr_ReName = "";
 	end
 	
 	local infoType = GetCursorInfo()
@@ -1889,7 +1889,7 @@ end
 
 function Atr_UpdateRecommendation (updatePrices)
 
-	if (gCurrentPane == gSellPane and gJustPosted_ItemLink and GetAuctionSellItemInfo() == nil) then
+	if Atr_ReName == "" or (gCurrentPane == gSellPane and gJustPosted_ItemLink and GetAuctionSellItemInfo() == nil) then
 		return;
 	end
 
@@ -1987,8 +1987,11 @@ function Atr_UpdateRecommendation (updatePrices)
 		MoneyInputFrame_SetCopper (Atr_ItemPrice,		new_Item_BuyoutPrice);
 	end
 	
+	print(Atr_StackSize())
+	
 	local cheapestStack = gCurrentPane.activeScan.bestPrices[Atr_StackSize()];
 
+	
 	Atr_Recommend_Basis_Text:SetTextColor (1,1,1);
 
 	if (Atr_ShowingHints()) then
@@ -3657,7 +3660,7 @@ function Atr_Duration_OnShow(self)
 				Atr_ReName = GetREInSlot(bagID, slotID);
 			else
 				Atr_ReNameSaved = ""
-				Atr_ReName = nil;
+				Atr_ReName = "";
 			end
 		end);
 end

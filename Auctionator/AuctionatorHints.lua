@@ -54,8 +54,8 @@ function Atr_BuildHints (itemName)
 
 	-- Auctionator Full Scan
 	
-	if (itemName ~= nil and gAtr_ScanDB[itemName] ~= nil) then
-		Atr_AppendHint (results, gAtr_ScanDB[itemName], ZT("Auctionator scan data"));
+	if (itemName ~= nil and Atr_ScanDB[itemName] ~= nil) then
+		Atr_AppendHint (results, Atr_ScanDB[itemName], ZT("Auctionator scan data"));
 	end
 
 	-- most recent historical price
@@ -227,12 +227,20 @@ function Atr_GetAuctionPrice (item)  -- itemName or itemID
 		return nil;
 	end
 
-	if (gAtr_ScanDB[itemName]) then
-		return gAtr_ScanDB[itemName];
+	if (Atr_ScanDB[itemName]) then
+		return Atr_ScanDB[itemName];
 	end
 	
 	return Atr_GetMostRecentSale (itemName);
 end	
+
+-----------------------------------------
+
+function Atr_GetEnchantPrice(enchantID)
+	if enchantID and Atr_ScanEnchantDB[enchantID] then
+		return Atr_ScanEnchantDB[enchantID].Current
+	end
+end
 
 -----------------------------------------
 
@@ -719,7 +727,6 @@ end
 -----------------------------------------
 
 function Atr_CalcDisenchantPrice (itemType, itemRarity, itemLevel)
-
 	if (Atr_IsWeaponType (itemType) or Atr_IsArmorType (itemType)) then
 		if (itemRarity == UNCOMMON or itemRarity == RARE or itemRarity == EPIC) then
 
@@ -739,50 +746,35 @@ function Atr_CalcDisenchantPrice (itemType, itemRarity, itemLevel)
 			return math.floor (dePrice/100);
 		end
 	end
-	
 	return nil;		-- can't be disenchanted
 end
 
 -----------------------------------------
 
-local function ShowTipWithPricing (tip, link, num)
+local function ShowTipWithPricing (tip, link, num, enchantID)
 
 	if (link == nil) then
 		return;
 	end
 
---[[
-	if (num == "tradeskill") then
-	
-		local skill = link;
-	
-		local n;
-		for n = 1,GetTradeSkillNumReagents(skill) do
-			local rname, _, rnum = GetTradeSkillReagentInfo(skill, n);
-			local rlink = GetTradeSkillReagentItemLink (skill, n);
-			zc.md (skill, rlink, rnum);
-		end
-	
-		return;
-	end
-]]--
-
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, _, _, _, _, itemVendorPrice = GetItemInfo (link);
 
 	local itemID = zc.ItemIDfromLink (link);
 	itemID = tonumber(itemID);
-	
+
 	local vendorPrice	= 0;
 	local auctionPrice	= 0;
 	local dePrice		= nil;
-	
+	local enchantPrice = 0;
+
 	if (AUCTIONATOR_V_TIPS == 1) then vendorPrice	= itemVendorPrice; end;
 	if (AUCTIONATOR_A_TIPS == 1) then auctionPrice	= Atr_GetAuctionPrice (itemName); end;
 	if (AUCTIONATOR_D_TIPS == 1) then dePrice		= Atr_CalcDisenchantPrice (itemType, itemRarity, itemLevel); end;
-	
+	if (AUCTIONATOR_ENCHANT_TIPS == 1) then enchantPrice = Atr_GetEnchantPrice (enchantID); end;
+
 	local xstring = "";
 	local showStackPrices = IsShiftKeyDown();
-	
+
 	if (AUCTIONATOR_SHIFT_TIPS == 2) then
 		showStackPrices = not IsShiftKeyDown();
 	end
@@ -799,14 +791,12 @@ local function ShowTipWithPricing (tip, link, num)
 	end
 
 	-- vendor info
-
 	if (AUCTIONATOR_V_TIPS == 1 and vendorPrice > 0) then
 		local vpadding = Atr_CalcTTpadding (vendorPrice, auctionPrice);
 		tip:AddDoubleLine (ZT("Vendor")..xstring, "|cFFFFFFFF"..zc.priceToMoneyString (vendorPrice))
 	end
-	
-	-- auction info
 
+	-- auction info
 	if (AUCTIONATOR_A_TIPS == 1) then
 		
 		local bonding = Atr_GetBonding(itemID);
@@ -823,9 +813,17 @@ local function ShowTipWithPricing (tip, link, num)
 			tip:AddDoubleLine (ZT("Auction")..xstring, "|cFFFFFFFF"..ZT("unknown").."  ");
 		end
 	end
-	
-	-- disenchanting info
 
+	-- mystic enchant info
+	if (AUCTIONATOR_ENCHANT_TIPS == 1) and enchantID and (itemRarity >= 3 or string.find(itemName, "Mystic Scroll:")) then
+		if enchantPrice then
+			tip:AddDoubleLine (ZT("Mystic Enchant Price")..xstring, "|cFFFFFFFF"..zc.priceToMoneyString (enchantPrice));
+		else
+			tip:AddDoubleLine (ZT("Mystic Enchant Price")..xstring, "|cFFFFFFFF"..ZT("unknown").."  ");
+		end
+	end
+
+	-- disenchanting info
 	if (AUCTIONATOR_D_TIPS == 1 and dePrice ~= nil) then
 		if (dePrice > 0) then
 			tip:AddDoubleLine (ZT("Disenchant")..xstring, "|cFFFFFFFF"..zc.priceToMoneyString(dePrice));
@@ -835,13 +833,13 @@ local function ShowTipWithPricing (tip, link, num)
 	end
 
 	local showDetails = true;
-	
+
 	if (AUCTIONATOR_DE_DETAILS_TIPS == 1) then showDetails = IsShiftKeyDown(); end;
 	if (AUCTIONATOR_DE_DETAILS_TIPS == 2) then showDetails = IsControlKeyDown(); end;
 	if (AUCTIONATOR_DE_DETAILS_TIPS == 3) then showDetails = IsAltKeyDown(); end;
 	if (AUCTIONATOR_DE_DETAILS_TIPS == 4) then showDetails = false; end;
 	if (AUCTIONATOR_DE_DETAILS_TIPS == 5) then showDetails = true; end;
-	
+
 	if (showDetails and dePrice ~= nil) then
 		Atr_AddDEDetailsToTip (tip, itemType, itemRarity, itemLevel, Atr_DEReqLevel(itemID));
 	end
@@ -855,14 +853,14 @@ end
 hooksecurefunc (GameTooltip, "SetBagItem",
 	function(tip, bag, slot)
 		local _, num = GetContainerItemInfo(bag, slot);
-		ShowTipWithPricing (tip, GetContainerItemLink(bag, slot), num);
+		ShowTipWithPricing (tip, GetContainerItemLink(bag, slot), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 hooksecurefunc (GameTooltip, "SetAuctionItem",
 	function (tip, type, index)
 		local _, _, num = GetAuctionItemInfo(type, index);
-		ShowTipWithPricing (tip, GetAuctionItemLink(type, index), num);
+		ShowTipWithPricing (tip, GetAuctionItemLink(type, index), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
@@ -870,7 +868,7 @@ hooksecurefunc (GameTooltip, "SetAuctionSellItem",
 	function (tip)
 		local name, _, count = GetAuctionSellItemInfo();
 		local __, link = GetItemInfo(name);
-		ShowTipWithPricing (tip, link, num);
+		ShowTipWithPricing (tip, link, num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
@@ -879,7 +877,7 @@ hooksecurefunc (GameTooltip, "SetLootItem",
 	function (tip, slot)
 		if LootSlotIsItem(slot) then
 			local link, _, num = GetLootSlotLink(slot);
-			ShowTipWithPricing (tip, link, num);
+			ShowTipWithPricing (tip, link, num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 		end
 	end
 );
@@ -887,21 +885,21 @@ hooksecurefunc (GameTooltip, "SetLootItem",
 hooksecurefunc (GameTooltip, "SetLootRollItem",
 	function (tip, slot)
 		local _, _, num = GetLootRollItemInfo(slot);
-		ShowTipWithPricing (tip, GetLootRollItemLink(slot), num);
+		ShowTipWithPricing (tip, GetLootRollItemLink(slot), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 
 hooksecurefunc (GameTooltip, "SetInventoryItem",
 	function (tip, unit, slot)
-		ShowTipWithPricing (tip, GetInventoryItemLink(unit, slot), GetInventoryItemCount(unit, slot));
+		ShowTipWithPricing (tip, GetInventoryItemLink(unit, slot), GetInventoryItemCount(unit, slot), MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 hooksecurefunc (GameTooltip, "SetGuildBankItem",
 	function (tip, tab, slot)
 		local _, num = GetGuildBankItemInfo(tab, slot);
-		ShowTipWithPricing (tip, GetGuildBankItemLink(tab, slot), num);
+		ShowTipWithPricing (tip, GetGuildBankItemLink(tab, slot), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
@@ -914,28 +912,28 @@ hooksecurefunc (GameTooltip, "SetTradeSkillItem",
 			num = select (3, GetTradeSkillReagentInfo(skill, id));
 		end
 
-		ShowTipWithPricing (tip, link, num);
+		ShowTipWithPricing (tip, link, num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 hooksecurefunc (GameTooltip, "SetTradePlayerItem",
 	function (tip, id)
 		local _, _, num = GetTradePlayerItemInfo(id);
-		ShowTipWithPricing (tip, GetTradePlayerItemLink(id), num);
+		ShowTipWithPricing (tip, GetTradePlayerItemLink(id), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 hooksecurefunc (GameTooltip, "SetTradeTargetItem",
 	function (tip, id)
 		local _, _, num = GetTradeTargetItemInfo(id);
-		ShowTipWithPricing (tip, GetTradeTargetItemLink(id), num);
+		ShowTipWithPricing (tip, GetTradeTargetItemLink(id), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 hooksecurefunc (GameTooltip, "SetQuestItem",
 	function (tip, type, index)
 		local _, _, num = GetQuestItemInfo(type, index);
-		ShowTipWithPricing (tip, GetQuestItemLink(type, index), num);
+		ShowTipWithPricing (tip, GetQuestItemLink(type, index), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
@@ -948,14 +946,14 @@ hooksecurefunc (GameTooltip, "SetQuestLogItem",
 			_, _, num = GetQuestLogRewardInfo(index)
 		end
 
-		ShowTipWithPricing (tip, GetQuestLogItemLink(type, index), num);
+		ShowTipWithPricing (tip, GetQuestLogItemLink(type, index), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 hooksecurefunc (GameTooltip, "SetInboxItem",
 	function (tip, index, attachIndex)
 		local _, _, num = GetInboxItem(index, attachIndex);
-		ShowTipWithPricing (tip, GetInboxItemLink(index, attachIndex), num);
+		ShowTipWithPricing (tip, GetInboxItemLink(index, attachIndex), num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
@@ -963,21 +961,21 @@ hooksecurefunc (GameTooltip, "SetSendMailItem",
 	function (tip, id)
 		local name, _, num = GetSendMailItem(id)
 		local name, link = GetItemInfo(name);
-		ShowTipWithPricing (tip, link, num);
+		ShowTipWithPricing (tip, link, num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 hooksecurefunc (GameTooltip, "SetHyperlink",
 	function (tip, itemstring, num)
 		local name, link = GetItemInfo (itemstring);
-		ShowTipWithPricing (tip, link, num);
+		ShowTipWithPricing (tip, link, num, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 
 hooksecurefunc (ItemRefTooltip, "SetHyperlink",
 	function (tip, itemstring)
 		local name, link = GetItemInfo (itemstring);
-		ShowTipWithPricing (tip, link);
+		ShowTipWithPricing (tip, link, nil, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
 	end
 );
 

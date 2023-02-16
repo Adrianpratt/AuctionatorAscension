@@ -12,7 +12,7 @@ function Atr_LoadOptionsSubPanel (f, name, title, subtitle)
 
 	local frameName = f:GetName();
 	
-	f.okay   = _G[frameName.."_Save"];
+	f.okay   = _G[frameName.."_Save"]
 
 	if (title    == nil) then title = name; end
 	if (subtitle == nil) then subtitle = ""; end
@@ -89,11 +89,13 @@ end
 
 function Atr_BasicOptionsFrame_Save()
 
-	local origValues = zc.msg_str (AUCTIONATOR_ENABLE_ALT, AUCTIONATOR_OPEN_ALL_BAGS, AUCTIONATOR_SHOW_ST_PRICE, AUCTIONATOR_DEFTAB, AUCTIONATOR_DEF_DURATION);
+	local origValues = zc.msg_str (AUCTIONATOR_ENABLE_ALT, AUCTIONATOR_OPEN_ALL_BAGS, AUCTIONATOR_SHOW_ST_PRICE, AUCTIONATOR_DEFTAB, AUCTIONATOR_DEF_DURATION, AUCTIONATOR_ROMOVE_BLOOFORGED, AUCTIONATOR_ROMOVE_SUFFIX);
 
 	AUCTIONATOR_ENABLE_ALT		= zc.BoolToNum(AuctionatorOption_Enable_Alt_CB:GetChecked ());
 	AUCTIONATOR_OPEN_ALL_BAGS	= zc.BoolToNum(AuctionatorOption_Open_All_Bags_CB:GetChecked ());
 	AUCTIONATOR_SHOW_ST_PRICE	= zc.BoolToNum(AuctionatorOption_Show_StartingPrice_CB:GetChecked ());
+	AUCTIONATOR_ROMOVE_BLOOFORGED = zc.BoolToNum(AuctionatorOption_Remove_Bloodforge_CB:GetChecked ());
+	AUCTIONATOR_ROMOVE_SUFFIX = zc.BoolToNum(AuctionatorOption_Remove_Suffix_CB:GetChecked ());
 
 	AUCTIONATOR_DEFTAB			= UIDropDownMenu_GetSelectedValue(AuctionatorOption_Deftab);
 
@@ -105,7 +107,7 @@ function Atr_BasicOptionsFrame_Save()
 		if (Atr_RB_L:GetChecked())	then	AUCTIONATOR_DEF_DURATION = "L"; end;
 	end
 
-	local newValues = zc.msg_str (AUCTIONATOR_ENABLE_ALT, AUCTIONATOR_OPEN_ALL_BAGS, AUCTIONATOR_SHOW_ST_PRICE, AUCTIONATOR_DEFTAB, AUCTIONATOR_DEF_DURATION);
+	local newValues = zc.msg_str (AUCTIONATOR_ENABLE_ALT, AUCTIONATOR_OPEN_ALL_BAGS, AUCTIONATOR_SHOW_ST_PRICE, AUCTIONATOR_DEFTAB, AUCTIONATOR_DEF_DURATION, AUCTIONATOR_ROMOVE_BLOOFORGED, AUCTIONATOR_ROMOVE_SUFFIX);
 
 	if (origValues ~= newValues) then
 		zc.msg_atr (ZT ("basic options saved"));
@@ -124,6 +126,8 @@ function Atr_SetupBasicOptionsFrame()
 	AuctionatorOption_Enable_Alt_CB:SetChecked			(zc.NumToBool(AUCTIONATOR_ENABLE_ALT));
 	AuctionatorOption_Open_All_Bags_CB:SetChecked		(zc.NumToBool(AUCTIONATOR_OPEN_ALL_BAGS));
 	AuctionatorOption_Show_StartingPrice_CB:SetChecked	(zc.NumToBool(AUCTIONATOR_SHOW_ST_PRICE));
+	AuctionatorOption_Remove_Bloodforge_CB:SetChecked	(zc.NumToBool(AUCTIONATOR_ROMOVE_BLOOFORGED));
+	AuctionatorOption_Remove_Suffix_CB:SetChecked		(zc.NumToBool(AUCTIONATOR_ROMOVE_SUFFIX));
 
 	UIDropDownMenu_Initialize		(AuctionatorOption_Deftab, AuctionatorOption_Deftab_Initialize);
 	UIDropDownMenu_SetSelectedValue	(AuctionatorOption_Deftab, AUCTIONATOR_DEFTAB);
@@ -141,6 +145,7 @@ function Atr_SetupTooltipsOptionsFrame ()
 	ATR_tipsVendorOpt_CB:SetChecked		(zc.NumToBool(AUCTIONATOR_V_TIPS));
 	ATR_tipsAuctionOpt_CB:SetChecked	(zc.NumToBool(AUCTIONATOR_A_TIPS));
 	ATR_tipsDisenchantOpt_CB:SetChecked	(zc.NumToBool(AUCTIONATOR_D_TIPS));
+	ATR_tipsMysticEnchantOpt_CB:SetChecked	(zc.NumToBool(AUCTIONATOR_ENCHANT_TIPS));
 
 	UIDropDownMenu_Initialize(Atr_tipsShiftDD, Atr_tipsShiftDD_Initialize);
 	UIDropDownMenu_SetSelectedValue(Atr_tipsShiftDD, AUCTIONATOR_SHIFT_TIPS);
@@ -154,16 +159,17 @@ end
 
 function Atr_TooltipsOptionsFrame_Save()
 
-	local origValues = zc.msg_str (AUCTIONATOR_V_TIPS, AUCTIONATOR_A_TIPS, AUCTIONATOR_D_TIPS, AUCTIONATOR_SHIFT_TIPS, AUCTIONATOR_DE_DETAILS_TIPS);
+	local origValues = zc.msg_str (AUCTIONATOR_V_TIPS, AUCTIONATOR_A_TIPS, AUCTIONATOR_D_TIPS, AUCTIONATOR_SHIFT_TIPS, AUCTIONATOR_DE_DETAILS_TIPS, AUCTIONATOR_ENCHANT_TIPS);
 
 	AUCTIONATOR_V_TIPS		= zc.BoolToNum(ATR_tipsVendorOpt_CB:GetChecked ());
 	AUCTIONATOR_A_TIPS		= zc.BoolToNum(ATR_tipsAuctionOpt_CB:GetChecked ());
 	AUCTIONATOR_D_TIPS		= zc.BoolToNum(ATR_tipsDisenchantOpt_CB:GetChecked ());
+	AUCTIONATOR_ENCHANT_TIPS = zc.BoolToNum(ATR_tipsMysticEnchantOpt_CB:GetChecked ());
 
 	AUCTIONATOR_SHIFT_TIPS		= UIDropDownMenu_GetSelectedValue(Atr_tipsShiftDD);
 	AUCTIONATOR_DE_DETAILS_TIPS	= UIDropDownMenu_GetSelectedValue(Atr_deDetailsDD);
 
-	local newValues = zc.msg_str (AUCTIONATOR_V_TIPS, AUCTIONATOR_A_TIPS, AUCTIONATOR_D_TIPS, AUCTIONATOR_SHIFT_TIPS, AUCTIONATOR_DE_DETAILS_TIPS);
+	local newValues = zc.msg_str (AUCTIONATOR_V_TIPS, AUCTIONATOR_A_TIPS, AUCTIONATOR_D_TIPS, AUCTIONATOR_SHIFT_TIPS, AUCTIONATOR_DE_DETAILS_TIPS, AUCTIONATOR_ENCHANT_TIPS);
 
 	if (origValues ~= newValues) then
 		zc.msg_atr (ZT("tooltip configuration saved"));
@@ -175,34 +181,31 @@ end
 
 -----------------------------------------
 
-function AuctionatorOption_Deftab_Initialize(self)
+function AuctionatorOption_Deftab_Initialize()
 
 	local info = UIDropDownMenu_CreateInfo();
 	
-	Atr_AddMenuPick (self, info, ZT("None"),	0, AuctionatorOption_Deftab_OnClick);
-	Atr_AddMenuPick (self, info, ZT("Sell"),	1, AuctionatorOption_Deftab_OnClick);
-	Atr_AddMenuPick (self, info, ZT("Buy"),		2, AuctionatorOption_Deftab_OnClick);
-	Atr_AddMenuPick (self, info, ZT("More"),	3, AuctionatorOption_Deftab_OnClick);
+	Atr_AddMenuPick (info, ZT("None"),	0, AuctionatorOption_Deftab_OnClick);
+	Atr_AddMenuPick (info, ZT("Sell"),	1, AuctionatorOption_Deftab_OnClick);
+	Atr_AddMenuPick (info, ZT("Buy"),	2, AuctionatorOption_Deftab_OnClick);
+	Atr_AddMenuPick (info, ZT("More"),	3, AuctionatorOption_Deftab_OnClick);
 
 end
 
 -----------------------------------------
 
 function AuctionatorOption_Deftab_OnClick(self)
-
-zc.md (self.owner, self.value);
-
 	UIDropDownMenu_SetSelectedValue(self.owner, self.value);
 end
 
 -----------------------------------------
 
-function Atr_tipsShiftDD_Initialize(self)
+function Atr_tipsShiftDD_Initialize()
 
 	local info = UIDropDownMenu_CreateInfo();
 	
-	Atr_AddMenuPick (self, info, ZT("stack price"),		1, Atr_tipsShiftDD_OnClick);
-	Atr_AddMenuPick (self, info, ZT("per item price"),	2, Atr_tipsShiftDD_OnClick);
+	Atr_AddMenuPick (info, ZT("stack price"),		1, Atr_tipsShiftDD_OnClick);
+	Atr_AddMenuPick (info, ZT("per item price"),	2, Atr_tipsShiftDD_OnClick);
 
 end
 
@@ -214,15 +217,15 @@ end
 
 -----------------------------------------
 
-function Atr_deDetailsDD_Initialize(self)
+function Atr_deDetailsDD_Initialize()
 
 	local info = UIDropDownMenu_CreateInfo();
 	
-	Atr_AddMenuPick (self, info, ZT("when SHIFT is held down"),	1, Atr_deDetailsDD_OnClick);
-	Atr_AddMenuPick (self, info, ZT("when CONTROL is held down"),	2, Atr_deDetailsDD_OnClick);
-	Atr_AddMenuPick (self, info, ZT("when ALT is held down"),		3, Atr_deDetailsDD_OnClick);
-	Atr_AddMenuPick (self, info, ZT("never"),						4, Atr_deDetailsDD_OnClick);
-	Atr_AddMenuPick (self, info, ZT("always"),					5, Atr_deDetailsDD_OnClick);
+	Atr_AddMenuPick (info, ZT("when SHIFT is held down"),	1, Atr_deDetailsDD_OnClick);
+	Atr_AddMenuPick (info, ZT("when CONTROL is held down"),	2, Atr_deDetailsDD_OnClick);
+	Atr_AddMenuPick (info, ZT("when ALT is held down"),		3, Atr_deDetailsDD_OnClick);
+	Atr_AddMenuPick (info, ZT("never"),						4, Atr_deDetailsDD_OnClick);
+	Atr_AddMenuPick (info, ZT("always"),					5, Atr_deDetailsDD_OnClick);
 
 end
 
@@ -369,10 +372,6 @@ function Atr_StackingList_Display()
 	
 	for sortkey, info in pairs (kStackList_categories) do
 		info.overrideFound = false;
-	end
-
-	if (AUCTIONATOR_STACKING_PREFS == nil) then
-		Atr_StackingPrefs_Init();
 	end
 
 	for text, spinfo in pairs (AUCTIONATOR_STACKING_PREFS) do
@@ -593,17 +592,17 @@ end
 
 -----------------------------------------
 
-function Atr_SONumStacks_Initialize(self)
+function Atr_SONumStacks_Initialize()
 
 	local info = UIDropDownMenu_CreateInfo();
 
-	Atr_AddMenuPick (self, info, ZT("As many as possible"),		-1,  Atr_SONumStacks_OnClick)
-	Atr_AddMenuPick (self, info, "1",								 1,  Atr_SONumStacks_OnClick)
-	Atr_AddMenuPick (self, info, "2",								 2,  Atr_SONumStacks_OnClick)
-	Atr_AddMenuPick (self, info, "3",								 3,  Atr_SONumStacks_OnClick)
-	Atr_AddMenuPick (self, info, "4",								 4,  Atr_SONumStacks_OnClick)
-	Atr_AddMenuPick (self, info, "5",								 5,  Atr_SONumStacks_OnClick)
-	Atr_AddMenuPick (self, info, "10",							10,  Atr_SONumStacks_OnClick)
+	Atr_AddMenuPick (info, ZT("As many as possible"),		-1,  Atr_SONumStacks_OnClick)
+	Atr_AddMenuPick (info, "1",								 1,  Atr_SONumStacks_OnClick)
+	Atr_AddMenuPick (info, "2",								 2,  Atr_SONumStacks_OnClick)
+	Atr_AddMenuPick (info, "3",								 3,  Atr_SONumStacks_OnClick)
+	Atr_AddMenuPick (info, "4",								 4,  Atr_SONumStacks_OnClick)
+	Atr_AddMenuPick (info, "5",								 5,  Atr_SONumStacks_OnClick)
+	Atr_AddMenuPick (info, "10",							10,  Atr_SONumStacks_OnClick)
                                             
 end
 
@@ -649,7 +648,7 @@ function Atr_ShowOptionTooltip (elem)
 		
 		local titleText = titleFrame and titleFrame:GetText() or "???";
 		
-		GameTooltip:SetOwner(elem, "ANCHOR_LEFT");
+		GameTooltip:SetOwner(this, "ANCHOR_LEFT");
 		GameTooltip:SetText(titleText, 0.9, 1.0, 1.0);
 		GameTooltip:AddLine(text, 0.5, 0.5, 1.0, 1);
 		GameTooltip:Show();
@@ -683,15 +682,15 @@ end
 
 -----------------------------------------
 
-function Atr_scanLevelDD_Initialize(self)
+function Atr_scanLevelDD_Initialize()
 
 	local info = UIDropDownMenu_CreateInfo();
 	
-	Atr_AddMenuPick (self, info, "|cffa335ee"..ZT("Epic").."|r",			5, Atr_scanLevelDD_OnClick);
-	Atr_AddMenuPick (self, info, "|cff0070dd"..ZT("Rare").."|r",			4, Atr_scanLevelDD_OnClick);
-	Atr_AddMenuPick (self, info, "|cff1eff00"..ZT("Uncommon").."|r",		3, Atr_scanLevelDD_OnClick);
-	Atr_AddMenuPick (self, info, "|cffffffff"..ZT("Common").."|r",		2, Atr_scanLevelDD_OnClick);
-	Atr_AddMenuPick (self, info, "|cff9d9d9d"..ZT("Poor (all)").."|r",	1, Atr_scanLevelDD_OnClick);
+	Atr_AddMenuPick (info, "|cffa335ee"..ZT("Epic").."|r",			5, Atr_scanLevelDD_OnClick);
+	Atr_AddMenuPick (info, "|cff0070dd"..ZT("Rare").."|r",			4, Atr_scanLevelDD_OnClick);
+	Atr_AddMenuPick (info, "|cff1eff00"..ZT("Uncommon").."|r",		3, Atr_scanLevelDD_OnClick);
+	Atr_AddMenuPick (info, "|cffffffff"..ZT("Common").."|r",		2, Atr_scanLevelDD_OnClick);
+	Atr_AddMenuPick (info, "|cff9d9d9d"..ZT("Poor (all)").."|r",	1, Atr_scanLevelDD_OnClick);
 
 end
 
@@ -705,7 +704,7 @@ end
 
 function Atr_scanLevelDD_showTip(self)
 
-	GameTooltip:SetOwner(self, "ANCHOR_LEFT");
+	GameTooltip:SetOwner(this, "ANCHOR_LEFT");
 	GameTooltip:SetText(ZT("Minimum Quality Level"), 0.9, 1.0, 1.0);
 	GameTooltip:AddLine(ZT("Only include items in the scanning database that are this level or higher"), 0.5, 0.5, 1.0, 1);
 	GameTooltip:Show();
@@ -746,9 +745,9 @@ function ShowInterfaceOptionsMask()
 		gInterfaceOptionsMask = CreateFrame ("Frame", "Atr_Mask_StdOptions", _G["InterfaceOptionsFrame"], "Atr_Mask_StdOptionsTempl");
 		gInterfaceOptionsMask:SetFrameLevel (129);
 	end
-	
+
 	gInterfaceOptionsMask:Show();
-	
+
 end
 
 -----------------------------------------

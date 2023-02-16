@@ -817,9 +817,9 @@ local function ShowTipWithPricing (tip, link, num, enchantID)
 	-- mystic enchant info
 	if (AUCTIONATOR_ENCHANT_TIPS == 1) and enchantID and (itemRarity >= 3 or string.find(itemName, "Mystic Scroll:")) then
 		if enchantPrice then
-			tip:AddDoubleLine (ZT("Mystic Enchant Price")..xstring, "|cFFFFFFFF"..zc.priceToMoneyString (enchantPrice));
+			tip:AddDoubleLine ("|cFF00FFFFMystic Enchant AH Price", "|cFFFFFFFF"..zc.priceToMoneyString (enchantPrice));
 		else
-			tip:AddDoubleLine (ZT("Mystic Enchant Price")..xstring, "|cFFFFFFFF"..ZT("unknown").."  ");
+			tip:AddDoubleLine ("|cFF00FFFFMystic Enchant AH Price", "|cFFFFFFFF"..ZT("unknown").."  ");
 		end
 	end
 
@@ -975,16 +975,41 @@ hooksecurefunc (GameTooltip, "SetHyperlink",
 hooksecurefunc (ItemRefTooltip, "SetHyperlink",
 	function (tip, itemstring)
 		local name, link = GetItemInfo (itemstring);
-		ShowTipWithPricing (tip, link, nil, MYSTIC_ENCHANT_SPELLS[GameTooltip:GetItemMysticEnchant()]);
+		local id
+		if link then
+			local mysticScroll = tonumber(link:match("item:(%d+)"))
+			if mysticScroll and string.find(name,"Mystic Scroll:") then
+				id = Atr_FindMysticEnchant(name)
+			end
+		end
+		ShowTipWithPricing (tip, link, nil, id);
 	end
 );
 
+--Item link tooltip
+hooksecurefunc("SetItemRef", function(link, ...)
+    local enchantID ,id = tonumber(link:match("spell:(%d+)"))
+	if enchantID and MYSTIC_ENCHANT_SPELLS[enchantID] then
+		id = MYSTIC_ENCHANT_SPELLS[enchantID]
+	else
+		return
+	end
+	local enchantPrice = Atr_GetEnchantPrice(MYSTIC_ENCHANTS[id].enchantID)
+	if enchantPrice then
+		ItemRefTooltip:AddDoubleLine ("|cFF00FFFFAuction Price", "|cFFFFFFFF"..zc.priceToMoneyString (enchantPrice));
+	else
+		ItemRefTooltip:AddDoubleLine ("|cFF00FFFFAuction Price", "|cFFFFFFFF"..ZT("unknown").."  ");
+	end
+end)
 
-
-
-
-
-
-
-
-
+--Spell tooltip
+GameTooltip:HookScript("OnTooltipSetSpell", function(self)
+    local id = select(3, self:GetSpell())
+    if id and not MYSTIC_ENCHANT_SPELLS[id] then return end
+	local enchantPrice = Atr_GetEnchantPrice(MYSTIC_ENCHANTS[MYSTIC_ENCHANT_SPELLS[id]].enchantID)
+	if enchantPrice then
+		self:AddDoubleLine ("|cFF00FFFFAuction Price", "|cFFFFFFFF"..zc.priceToMoneyString (enchantPrice));
+	else
+		self:AddDoubleLine ("|cFF00FFFFAuction Price", "|cFFFFFFFF"..ZT("unknown").."  ");
+	end
+end)

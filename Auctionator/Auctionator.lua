@@ -21,7 +21,6 @@ AUCTIONATOR_DEF_DURATION	= "N";		-- none
 AUCTIONATOR_V_TIPS			= 1;
 AUCTIONATOR_A_TIPS			= 1;
 AUCTIONATOR_D_TIPS			= 1;
-AUCTIONATOR_ENCHANT_TIPS	= 1;
 AUCTIONATOR_SHIFT_TIPS		= 1;
 AUCTIONATOR_DE_DETAILS_TIPS	= 4;		-- off by default
 AUCTIONATOR_DEFTAB			= 1;
@@ -114,7 +113,6 @@ local gAtr_CheckingActive_State			= ATR_CACT_NULL;
 Atr_ptime = nil;		-- a more precise timer but may not be updated very frequently
 
 Atr_ScanDB			= nil;
-Atr_ScanEnchantDB = nil;
 
 -----------------------------------------
 
@@ -427,15 +425,6 @@ function Atr_InitScanDB()
 		AUCTIONATOR_PRICE_DATABASE[realm_Faction] = {};
 	end
 
-	if not AUCTIONATOR_MYSTIC_ENCHANT_PRICE_DATABASE then
-		AUCTIONATOR_MYSTIC_ENCHANT_PRICE_DATABASE = {};
-	end
-
-	if not AUCTIONATOR_MYSTIC_ENCHANT_PRICE_DATABASE[realm_Faction] then
-		AUCTIONATOR_MYSTIC_ENCHANT_PRICE_DATABASE[realm_Faction] = {};
-	end
-
-	Atr_ScanEnchantDB = AUCTIONATOR_MYSTIC_ENCHANT_PRICE_DATABASE[realm_Faction];
 	Atr_ScanDB = AUCTIONATOR_PRICE_DATABASE[realm_Faction];
 
 end
@@ -497,7 +486,6 @@ function Atr_OnLoad()
 		AUCTIONATOR_V_TIPS = 0;
 		AUCTIONATOR_A_TIPS = 0;
 		AUCTIONATOR_D_TIPS = 0;
-		AUCTIONATOR_ENCHANT_TIPS = 0;
 
 		AUCTIONATOR_SHOW_TIPS = 2;
 	end
@@ -657,17 +645,8 @@ function Atr_ShowHide_StartingPrice()
 	end
 end
 
-Atr_ReNameSaved = "";
------------------------------------------
-function Atr_REsearch_Toggle()
-	if Atr_RESearch:GetChecked() then
-		Atr_ReNameSaved = ""
-	 end
-end
 
-function Atr_SetreName(name)
-	Atr_ReName = name;
-end
+-----------------------------------------
 
 function Atr_GetSellItemInfo ()
 
@@ -711,25 +690,6 @@ function Atr_GetSellItemInfo ()
 				auctionItemName = auctionItemName:gsub(" "..suffix, "")
 			end
 		end
-			--Swap auction name to search for re on the item
-			if Atr_RESearch:GetChecked() and Atr_ReName ~= "" then
-				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[Atr_ReName].spellID);
-				exact = false;
-				Atr_ReNameSaved = Atr_ReName;
-				Atr_ReName = "";
-			elseif Atr_RESearch:GetChecked() and Atr_ReNameSaved ~= "" then
-				auctionItemName = "RE:" .. GetSpellInfo(MYSTIC_ENCHANTS[Atr_ReNameSaved].spellID);
-				exact = false;
-				Atr_ReName = "";
-			elseif (string.find(auctionItemName, "Mystic Scroll")) == 1 then
-				local text = string.sub(auctionItemName, 15)
-				if (text and text ~= "") then
-					-- RE: is used for checking bag count
-					auctionItemName = "RE:" .. text --text:gsub("^%s*(.-)%s*$", "%1")
-					exact = false
-					Atr_ReNameSaved = ""
-				end
-			end
 
 		if (auctionItemLink == nil) then
 			return "",0,nil;
@@ -1034,10 +994,6 @@ local function Atr_LoadContainerItemToSellPane()
 	local bagID  = this:GetParent():GetID();
 	local slotID = this:GetID();
 
-	if Atr_RESearch:GetChecked() then
-		gPrevSellItemLink = nil
-	end
-
 	if (not Atr_IsTabSelected(SELL_TAB)) then
 		Atr_SelectPane (SELL_TAB);
 	end
@@ -1047,14 +1003,6 @@ local function Atr_LoadContainerItemToSellPane()
 	end
 
 	PickupContainerItem(bagID, slotID);
-	--Get MysticEnchant from alt left clicking item
-	if GetREInSlot(bagID, slotID) ~= nil then
-		Atr_ReName = GetREInSlot(bagID, slotID);
-		Atr_ReNameSaved = ""
-	else
-		Atr_ReNameSaved = ""
-		Atr_ReName = "";
-	end
 
 	local infoType = GetCursorInfo()
 
@@ -3611,17 +3559,6 @@ end
 
 function Atr_Duration_OnShow(self)
 	UIDropDownMenu_Initialize (self, Atr_Duration_Initialize);
-		--Hook Container ID to get MysticEnchant from item
-		hooksecurefunc("ContainerFrameItemButton_OnClick",function(self,button)
-			local bagID,slotID=self:GetParent():GetID(),self:GetID();
-			if GetREInSlot(bagID, slotID) ~= nil then
-				Atr_ReNameSaved = ""
-				Atr_ReName = GetREInSlot(bagID, slotID);
-			else
-				Atr_ReNameSaved = ""
-				Atr_ReName = "";
-			end
-		end);
 end
 
 -----------------------------------------

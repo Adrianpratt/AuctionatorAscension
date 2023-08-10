@@ -152,17 +152,9 @@ function AtrScan:Init (itemName)
 	self:UpdateItemLink (Atr_GetItemLink (itemName));
 end
 
-function Atr_FindMysticEnchant(name)
-	for i,v in pairs(MYSTIC_ENCHANTS) do
-		if v.enchantID ~= 0 and string.find(GetSpellInfo(v.spellID),gsub(name,"Mystic Scroll: ","")) then
-			return v.enchantID
-		end
-	end
-end
-
 -----------------------------------------
 
-function AtrScan:UpdateItemLink (itemLink, enchantID, mysticScroll)
+function AtrScan:UpdateItemLink (itemLink)
 
 	self.itemLink = itemLink;
 
@@ -174,8 +166,6 @@ function AtrScan:UpdateItemLink (itemLink, enchantID, mysticScroll)
 		self.itemQuality	= quality;
 		self.itemClass		= Atr_ItemType2AuctionClass (sType);
 		self.itemSubclass	= Atr_SubType2AuctionSubclass (self.itemClass, sSubType);
-		self.enchantID = enchantID
-		self.mysticScroll = mysticScroll
 
 		self.itemTextColor = { 1.0, 1.0, 1.0 };
 
@@ -331,11 +321,6 @@ function AtrSearch:AnalyzeResultsPage()
 		for x = 1, numBatchAuctions do
 
 			local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner = GetAuctionItemInfo("list", x);
-			local enchantID = GetAuctionItemMysticEnchant("list", x)
-			local mysticScroll = nil
-			if string.find(name,"Mystic Scroll:") then
-				mysticScroll = Atr_FindMysticEnchant(name)
-			end
 
 			if (owner == nil) then
 				numNilOwners = numNilOwners + 1;
@@ -352,10 +337,10 @@ function AtrSearch:AnalyzeResultsPage()
 
 				local scn = self.items[name];
 
-				scn:AddScanItem (name, count, buyoutPrice, owner, 1, curpage, enchantID ,mysticScroll);
+				scn:AddScanItem (name, count, buyoutPrice, owner, 1, curpage);
 
 				if (scn.itemLink == nil or self.itemClass == nil) then
-					scn:UpdateItemLink (GetAuctionItemLink("list", x), enchantID, mysticScroll);
+					scn:UpdateItemLink (GetAuctionItemLink("list", x));
 				end
 
 				if (self.callback) then
@@ -377,7 +362,7 @@ end
 
 -----------------------------------------
 
-function AtrScan:AddScanItem (name, stackSize, buyoutPrice, owner, numAuctions, curpage, enchantID, mysticScroll)
+function AtrScan:AddScanItem (name, stackSize, buyoutPrice, owner, numAuctions, curpage)
 
 	local sd = {};
 
@@ -391,7 +376,6 @@ function AtrScan:AddScanItem (name, stackSize, buyoutPrice, owner, numAuctions, 
 		sd["owner"]			= owner;
 		sd["pagenum"]		= curpage;
 		sd["enchantID"]		= enchantID
-		sd["mysticScroll"]	= mysticScroll
 
 		tinsert (self.scanData, sd);
 
@@ -644,7 +628,6 @@ function AtrSearch:Finish()
 
 	local x = 1;
 	self.sortedScans = {};
-	local lowestEnchantPrice = {}
 
 	for name,scn in pairs (self.items) do
 		self.sortedScans[x] = scn;
@@ -658,34 +641,10 @@ function AtrSearch:Finish()
 		-- update the fullscan DB
 
 		local newprice = Atr_CalcNewDBprice (scn.itemName, scn.lowprices);
-		local enchantID = scn.enchantID
 		if (newprice > 0) then
 			if (scn.itemQuality + 1 >= AUCTIONATOR_SCAN_MINLEVEL) then
 				Atr_ScanDB[scn.itemName] = newprice;
 			end
-
-			if (scn.enchantID and (scn.itemQuality + 1 >= 4)) or scn.mysticScroll then
-				if scn.mysticScroll then enchantID = scn.mysticScroll end
-				if enchantID and not Atr_ScanEnchantDB[enchantID] then Atr_ScanEnchantDB[enchantID] = {} end
-				if (not Atr_ScanEnchantDB[enchantID].Highest or newprice > Atr_ScanEnchantDB[enchantID].Highest) then
-				Atr_ScanEnchantDB[enchantID].Highest = newprice
-				end
-				if (not Atr_ScanEnchantDB[enchantID].Lowest or newprice < Atr_ScanEnchantDB[enchantID].Lowest) then
-					Atr_ScanEnchantDB[enchantID].Lowest = newprice
-				end
-				if (not Atr_ScanEnchantDB[enchantID].Current or newprice < Atr_ScanEnchantDB[enchantID].Current) then
-					Atr_ScanEnchantDB[enchantID].Current = newprice
-				end
-				if not lowestEnchantPrice[enchantID] or (lowestEnchantPrice[enchantID] and newprice < lowestEnchantPrice[enchantID]) then
-					lowestEnchantPrice[enchantID] = newprice
-				end
-			end
-		end
-	end
-
-	if Atr_RESearch:GetChecked() then
-		for name, price in pairs (lowestEnchantPrice) do
-			Atr_ScanEnchantDB[name].Current = price
 		end
 	end
 
@@ -1151,20 +1110,13 @@ function Atr_FullScanAnalyze()
 	local x;
 
 	local qualities = {};
-	local lowestEnchantPrice = {};
 
 	if (numBatchAuctions > 0) then
 
 		for x = 1, numBatchAuctions do
 
 			local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice = GetAuctionItemInfo("list", x);
-			local enchantID = GetAuctionItemMysticEnchant("list", x)
 			qualities[name] = quality;
-
-			local mysticScroll = nil
-			if string.find(name,"Mystic Scroll:") then
-				mysticScroll = Atr_FindMysticEnchant(name)
-			end
 
 			if (name ~= nil and buyoutPrice ~= nil) then
 
@@ -1176,20 +1128,6 @@ function Atr_FullScanAnalyze()
 					end
 
 					Atr_AddToLowPrices (lowprices[name], itemPrice);
-					if (enchantID and (quality + 1 >= 4)) or mysticScroll then
-						if mysticScroll then enchantID = mysticScroll end
-						
-						if enchantID and not Atr_ScanEnchantDB[enchantID] then Atr_ScanEnchantDB[enchantID] = {} end
-						if (not Atr_ScanEnchantDB[enchantID].Highest or itemPrice > Atr_ScanEnchantDB[enchantID].Highest) then
-						Atr_ScanEnchantDB[enchantID].Highest = itemPrice
-						end
-						if (not Atr_ScanEnchantDB[enchantID].Lowest or itemPrice < Atr_ScanEnchantDB[enchantID].Lowest) then
-							Atr_ScanEnchantDB[enchantID].Lowest = itemPrice
-						end
-						if not lowestEnchantPrice[enchantID] or (lowestEnchantPrice[enchantID] and itemPrice < lowestEnchantPrice[enchantID]) then
-							lowestEnchantPrice[enchantID] = itemPrice
-						end
-					end
 				end
 			end
 
@@ -1197,10 +1135,6 @@ function Atr_FullScanAnalyze()
 				Atr_FullScanStatus:SetText (ZT("Processing").." ("..x..")");
 			end
 		end
-	end
-
-	for name, price in pairs (lowestEnchantPrice) do
-		Atr_ScanEnchantDB[name].Current = price
 	end
 
 	local numEachQual = {0, 0, 0, 0, 0, 0, 0, 0, 0};
